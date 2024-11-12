@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0d47a1;
+        }
+
+        .add-btn {
+            margin-top: 10px;
+            background: #2196f3;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+        .preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .experience-item, .education-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .profile-picture-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #2196f3;
+        }
+
+        .preview-profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .footer {
+            background: #1a237e;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: auto;
+        }
+
+        /* Added error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        input:invalid + .error-message {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .profile-picture-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .preview {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Resume Builder</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <form id="resumeForm" onsubmit="return false;">
+            <div class="section">
+                <h2>Personal Information</h2>
+                <div class="profile-picture-container">
+                    <div id="profile-picture-display">
+                        <img src="/api/placeholder/150/150" alt="Profile Picture" class="profile-picture">
+                    </div>
+                    <div>
+                        <input type="file" id="profile-picture" accept="image/*" onchange="handleProfilePicture(event)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name*</label>
+                    <input type="text" id="name" required>
+                    <div class="error-message">Please enter your full name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fatherName">Father's Name*</label>
+                    <input type="text" id="fatherName" required>
+                    <div class="error-message">Please enter your father's name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age*</label>
+                    <input type="number" id="age" min="16" max="100" required>
+                    <div class="error-message">Please enter a valid age between 16 and 100</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="email" id="email" required>
+                    <div class="error-message">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone*</label>
+                    <input type="tel" id="phone" pattern="[0-9]{10,}" required>
+                    <div class="error-message">Please enter a valid phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">Professional Summary*</label>
+                    <textarea id="summary" required></textarea>
+                    <div class="error-message">Please enter your professional summary</div>
+                </div>
+            </div>
+
+            <div class="section" id="experience-section">
+                <h2>Work Experience</h2>
+                <div id="experience-list"></div>
+                <button type="button" class="add-btn" onclick="addExperience()">Add Experience</button>
+            </div>
+
+            <div class="section" id="education-section">
+                <h2>Education</h2>
+                <div id="education-list"></div>
+                <button type="button" class="add-btn" onclick="addEducation()">Add Education</button>
+            </div>
+
+            <div class="section">
+                <h2>Skills</h2>
+                <div class="form-group">
+                    <input type="text" id="skills" required>
+                    <div class="error-message">Please enter your skills</div>
+                </div>
+            </div>
+
+            <button type="button" onclick="validateAndGeneratePreview()">Generate Preview</button>
+        </form>
+
+        <div id="preview" class="preview"></div>
+    </div>
+
+    <script>
+        let profilePicture = null;
+
+        function handleProfilePicture(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5000000) { // 5MB limit
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const displayContainer = document.getElementById('profile-picture-display');
+                    displayContainer.innerHTML = `<img src="${e.target.result}" class="profile-picture" alt="Profile Picture">`;
+                    profilePicture = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addExperience() {
+            const experienceList = document.getElementById('experience-list');
+            const experienceItem = document.createElement('div');
+            experienceItem.className = 'experience-item';
+            experienceItem.innerHTML = `
+                <div class="form-group">
+                    <label>Company*</label>
+                    <input type="text" class="company" required>
+                </div>
+                <div class="form-group">
+                    <label>Position*</label>
+                    <input type="text" class="position" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration*</label>
+                    <input type="text" class="duration" required>
+                </div>
+                <div class="form-group">
+                    <label>Description*</label>
+                    <textarea class="description" required></textarea>
+                </div>
+                <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
+            `;
+            experienceList.appendChild(experienceItem);
+        }
+
+        function addEducation() {
+            const educationList = document.getElementById('education-list');
+            const educationItem = document.createElement('div');
+            educationItem.className = 'education-item';
+            educationItem.innerHTML = `
+                <div class="form-group">
+                    <label>Institution*</label>
+                    <input type="text" class="institution" required>
+                </div>
+                <div class="form-group">
+                    <label>Degree*</label>
+                    <input type="text" class="degree" required>
+                </div>
+                <div class="form-group">
+                    <label>Year*</label>
+                    <input type="text" class="year" required pattern="[0-9]{4}">
+                </div>
+                <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
+            `;
+            educationList.appendChild(educationItem);
+        }
+
+        function validateAndGeneratePreview() {
+            const form = document.getElementById('resumeForm');
+            const inputs = form.querySelectorAll('input[required], textarea[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    input.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    input.nextElementSibling.style.display = 'none';
+                }
+            });
+
+            if (isValid) {
+                generatePreview();
+            } else {
+                alert('Please fill in all required fields correctly.');
+            }
+        }
+
+        function generatePreview() {
+            const preview = document.getElementById('preview');
+            const name = document.getElementById('name').value;
+            const fatherName = document.getElementById('fatherName').value;
+            const age = document.getElementById('age').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const summary = document.getElementById('summary').value;
+            const skills = document.getElementById('skills').value;
+
+            let experienceHTML = '';
+            document.querySelectorAll('.experience-item').forEach(item => {
+                experienceHTML += `
+                    <div class="experience-preview">
+                        <h3>${item.querySelector('.position').value} at ${item.querySelector('.company').value}</h3>
+                        <p>${item.querySelector('.duration').value}</p>
+                        <p>${item.querySelector('.description').value}</p>
+                    </div>
+                `;
+            });
+
+            let educationHTML = '';
+            document.querySelectorAll('.education-item').forEach(item => {
+                educationHTML += `
+                    <div class="education-preview">
+                        <h3>${item.querySelector('.degree').value}</h3>
+                        <p>${item.querySelector('.institution').value} - ${item.querySelector('.year').value}</p>
+                    </div>
+                `;
+            });
+
+            preview.innerHTML = `
+                <div class="preview-header">
+                    ${profilePicture ? `<img src="${profilePicture}" class="preview-profile-picture" alt="Profile Picture">` : ''}
+                    <div>
+                        <h2>Personal Information</h2><br>
+                        <p>Name: ${name}</p><br>
+                        <p>Father's Name: ${fatherName}</p><br>
+                        <p>Age: ${age}</p><br>
+                        <p>Email: ${email}</p><br>
+                        <p>Phone: ${phone}</p><br>
+                    </div>
+                </div>
+                <div class="preview-section">
+                    <h3>Professional Summary</h3>
+                    <p>${summary}</p>
+                </div><br>
+                <div class="preview-section">
+                    <h3>Experience</h3>
+                    ${experienceHTML}
+                </div><br>
+                <div class="preview-section">
+                    <h3>Education</h3>
+                    ${educationHTML}
+                </div><br>
+                <div class="preview-section">
+                    <h3>Skills</h3>
+                    <p>${skills}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html
